@@ -2,10 +2,8 @@ import sqlite3
 
 # open databese from file
 try:
-    db_profit = sqlite3.connect("data/profits.db")
-    db_loss= sqlite3.connect("data/loss.db")
-    cursor_profit = db_profit.cursor()
-    cursor_loss = db_loss.cursor()
+    db = sqlite3.connect("data/database.db")
+    cursor = db.cursor()
 except Exception:
     print("Something's wrong.\nCan't create or open database.\nEnd of program.")
     exit()
@@ -64,4 +62,4 @@ while True:
 
     else:
         # entered number isn't correct
-        print("\nEnter the activity number located on the left side of the menu\nor enter 0 to end the program.") 
+        print("\nEnter the activity number located on the left side of the menu\nor enter 0 to end the program.")
