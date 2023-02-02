@@ -14,17 +14,43 @@ except Exception:
     exit()
 
 def add_category():
-    # add a category to the database
-    # request the name and type of category
-    category_name = input("Enter the name of category: ")
-    category_type = input("Type of category:\nP - profit type,\nL - loss type\nType: ")
+    while True:
+        # add a category to the database
+        # request the name and type of category
+        category_name = input("Enter the name of category: ")
+        #category_type = input("Type of category:\nP - profit type,\nL - loss type\nType: ")
 
-    # depends of category tape - create a new category in proper database
-    # cursor.execute(""" """)
-    if category_type.upper() == "P":
-        pass
-    elif category_type.upper() == "L":
-        pass
+        # depends of category tape - create a new category in proper database
+        try:
+            cursor.execute(""" CREATE TABLE {}(id integer PRIMARY KEY, type char, description TEXT, amount real) """.format(category_name))
+            break
+        except Exception:
+            # this name exist in database
+            # request to fix or end adding new category
+            print( "This category:'{}' already exist.".
+            format(category_name) )
+            decision = input("Try again? yes/no ").lower()
+            if decision == "no":
+                break
+            elif decision != "yes" and decision != "no":
+                pass
+            else:
+                # decision is yes
+                pass
+
+def list_all_tables():
+    # Getting all tables from sqlite_master
+    sql_query = """SELECT name FROM sqlite_master
+    WHERE type='table';"""
+
+    # Creating cursor object using connection object        #%%cursor = sqliteConnection.cursor()
+    
+    # executing our sql query
+    cursor.execute(sql_query)
+    print("List of tables\n")
+    
+    # printing all tables list
+    print(cursor.fetchall())
 
 # display welcome mesage
 print("""\nHello in 'My Savings' console program.
@@ -57,7 +83,8 @@ while True:
     
     if menu_option == "0":
         # save changes in database and close program
-        # save databese     
+        # save databese   
+        list_all_tables()
         db.commit()
         db.close()
         print("Save and exit. Thank you.")
