@@ -4,6 +4,11 @@ import sqlite3
 try:
     db = sqlite3.connect("data/database.db")
     cursor = db.cursor()
+    try:
+        db.execute(""" CREATE TABLE financial_operations(id integer PRIMARY KEY, type char, description TEXT, amount real NOT NULL) """)
+    except:
+        print("Can't create main table in database.")
+        print("Table probably exist.")
 except Exception:
     print("Something's wrong.\nCan't create or open database.\nEnd of program.")
     exit()
@@ -52,11 +57,9 @@ while True:
     
     if menu_option == "0":
         # save changes in database and close program
-        # save databese
-        db_profit.commit()
-        db_loss.commit()
-        db_profit.close()
-        db_loss.close()
+        # save databese     
+        db.commit()
+        db.close()
         print("Save and exit. Thank you.")
         exit()
 
