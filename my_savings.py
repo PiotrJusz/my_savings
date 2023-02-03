@@ -1,5 +1,8 @@
 import sqlite3
 
+# lenght of description used at creating table for display
+lenght = {"description": 30}
+
 # open databese from file
 try:
     db = sqlite3.connect("data/database.db")
@@ -33,10 +36,9 @@ def add_category():
             if decision == "no":
                 break
             elif decision != "yes" and decision != "no":
-                pass
-            else:
-                # decision is yes
-                pass
+                print("Back to main menu.")
+                break
+            
 
 def list_all_tables():
     # Getting all tables from sqlite_master
@@ -51,6 +53,50 @@ def list_all_tables():
     
     # printing all tables list
     print(cursor.fetchall())
+
+def add_operation(type):
+    # request description and amount
+    while True:
+        # checking lenght of description, lenght is reading from dictionary called lenght
+        description = input("Description of operation: ") 
+        if len(description) > lenght["description"] :
+            print("Description is too long. Make a shorter note, please.")
+        else:
+            break
+    while True:
+        try:
+            # cast amount to float and round to 2 numbers
+            amount = float( input("Amount: ") )
+            amount = round(amount, 2)
+            break
+        except ValueError:
+            print("Enter a number.\nFor the decimal part, use '.'.")
+    # display operation
+    if type == "L":
+        print("Operation: LOSS.")
+    elif type == "P":
+        print("Operation: PROFIT.")
+    print(F"{amount}\t{description}")
+
+    # request confirm or reject operation
+    while True:
+        decision_1 = input("Add operation? (yes, no): ")
+        if decision_1.lower() == "yes":
+            # save the operation
+            print("Your operation will be save.")
+            print(F"{type}\t{amount}\t{description}")
+            break
+        elif decision_1.lower()== "no":
+            decision_2 = input("Do you want to improve operations? (yes, no): ")
+            if decision_2.lower() == "yes":
+                add_operation(type)
+                break
+            elif decision_2.lower() == "no":
+                break
+            else:
+                print("Give the correct answer? (yes, no)")
+
+
 
 # display welcome mesage
 print("""\nHello in 'My Savings' console program.
@@ -69,10 +115,11 @@ while True:
     menu_option = input("Enter the number of activity: ")
 
     if menu_option == "1":
-        pass
+        add_operation("P")
 
     elif menu_option == "2":
-        pass
+        add_operation("L")
+
 
     elif menu_option == "3":
         # add new categories for income or cost
