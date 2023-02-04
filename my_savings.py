@@ -1,7 +1,7 @@
 import sqlite3
 
 # lenght of description used at creating table for display
-lenght = {"description": 30}
+lenght = {"id":5, "type":4,"description": 30, "amount":10}
 
 # open databese from file
 try:
@@ -85,6 +85,10 @@ def add_operation(type):
             # save the operation
             print("Your operation will be save.")
             print(F"{type}\t{amount}\t{description}")
+            # db.execute(""" CREATE TABLE financial_operations(id integer PRIMARY KEY, type char, description TEXT, amount real NOT NULL) """)
+            # cursor.execute(""" INSERT INTO ebookstore(ID, TITLE, AUTHOR, QTY) VALUES (?,?,?,?)""", (id, title, author, qty))
+            db.execute(""" INSERT INTO financial_operations(type, description, amount ) VALUES (?, ?, ?) """, (type, description, amount) )
+
             break
         elif decision_1.lower()== "no":
             decision_2 = input("Do you want to improve operations? (yes, no): ")
@@ -96,7 +100,19 @@ def add_operation(type):
             else:
                 print("Give the correct answer? (yes, no)")
 
+def print_data(data_):
+    # display header
+    print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+    print("|no" + ( lenght["id"] - len("no") )* " " + "|type" + ( lenght["type"] - len("type") )  * " "  + "|description" + ( lenght["description"] - len("description") ) * " " +"|amount" + ( lenght["amount"] - len("amount") ) * " " + "|" )
+    print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+    for row in data_:
+            print(F"|{row[0]} " + ( lenght["id"] - len(str( row[0] ) ) - 1)* " " + F"|{row[1]}" + ( lenght["type"] - len(str( row[1] )) )  * " "  + F"|{row[2]}" + ( lenght["description"] - len(str( row[2]) ) ) * " " +F"|{row[3]}" + ( lenght["amount"] - len(str( row[3] )) ) * " " + "|" ) # - 1 of " "
+            #print(F"| {row[0]} | {row[1]} | {row[2]} | {row[3]} |")
+            print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"] * "-" + "+" + lenght["amount"] * "-" + "+")
+    input("Press enter to continue.")
+    print()
 
+# ****************MAIN*********************************
 
 # display welcome mesage
 print("""\nHello in 'My Savings' console program.
@@ -126,7 +142,8 @@ while True:
         add_category()
 
     elif menu_option == "10":
-        pass
+        db.execute(""" SELECT id, type,  description, amount FROM financial_operations """)
+        print_data( cursor.execute(""" SELECT id, type,  description, amount from financial_operations  """) )
     
     if menu_option == "0":
         # save changes in database and close program
