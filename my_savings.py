@@ -40,7 +40,7 @@ def add_category():
                 break
             
 
-def list_all_tables():
+def list_all_cetegories():
     # Getting all tables from sqlite_master
     sql_query = """SELECT name FROM sqlite_master
     WHERE type='table';"""
@@ -49,12 +49,17 @@ def list_all_tables():
     
     # executing our sql query
     cursor.execute(sql_query)
-    print("List of tables\n")
     
-    # printing all tables list
-    print(cursor.fetchall())
+    # printing all categories
+
+    list_of_categories = []
+    for item in cursor:
+        print( str(item)[2: -3] +", ", end="")
 
 def add_operation(type):
+    # request category
+    while True:
+        break
     # request description and amount
     while True:
         # checking lenght of description, lenght is reading from dictionary called lenght
@@ -148,7 +153,7 @@ while True:
     if menu_option == "0":
         # save changes in database and close program
         # save databese   
-        list_all_tables()
+        list_all_cetegories()
         db.commit()
         db.close()
         print("Save and exit. Thank you.")
