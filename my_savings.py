@@ -9,6 +9,7 @@ try:
     cursor = db.cursor()
     try:
         db.execute(""" CREATE TABLE financial_operations(id integer PRIMARY KEY, type char, category text, description TEXT, amount real NOT NULL) """)
+        db.execute(""" CREATE TABLE a_set_of_categories(id integer PRIMARY KEY, genre char)""")
     except:
         print("Can't create main table in database.")
         print("Table probably exist.")
@@ -16,6 +17,9 @@ except Exception:
     print("Something's wrong.\nCan't create or open database.\nEnd of program.")
     exit()
 
+
+
+"""
 def add_category():
     while True:
         # add a category to the database
@@ -25,25 +29,55 @@ def add_category():
 
         # depends of category tape - create a new category in proper database
         try:
-            cursor.execute(""" CREATE TABLE {}(id integer PRIMARY KEY, type char, description TEXT, amount real) """.format(category_name))
+            #cursor.execute(""" """CREATE TABLE {}(id integer PRIMARY KEY, type char, category text, description TEXT, amount real)""" """.format(category_name))
             break
         except Exception:
             # this name exist in database
             # request to fix or end adding new category
-            print( "This category:'{}' already exist.".
-            format(category_name) )
+            print( "This category:'{}' already exist.".format(category_name) )
             decision = input("Try again? yes/no ").lower()
             if decision == "no":
                 break
             elif decision != "yes" and decision != "no":
                 print("Back to main menu.")
                 break
+"""
+
+# creating or adding category to database stored category
+def add_category():
+    while True:
+        # add a category to the database
+        # request the name and type of category
+        # category name is list type - then is a agument in searching in database
+        category_name = []
+        print("Add a  ategory. Enter '0'(zero) to interapt and back to main menu. ")
+        category_name.append( input("Enter the name of category: ") )
+        if category_name == "0":
+            # back to main menu - user interapt adding category
+            break
+        else:
+            try:
+                # adding category to database
+                db.execute(""" INSERT INTO a_set_of_categories(genre) VALUES (?) """, ( category_name ) )
+                print("Category: {} added to database.".format(category_name))
+                break
+            except Exception as e:
+                # print(repr(e)) 
+                # this name exist in database
+                # request to fix or end adding new category
+                print( "This category:'{}' already exist.".format(category_name) )
+                decision = input("Try again? yes/no ").lower()
+                if decision == "no":
+                    break
+                elif decision != "yes" and decision != "no":
+                    print("Back to main menu.")
+                    break
             
 
+"""
 def list_all_cetegories():
     # Getting all tables from sqlite_master
-    sql_query = """SELECT name FROM sqlite_master
-    WHERE type='table';"""
+    sql_query = """"SELECT name FROM sqlite_master WHERE type='table';""""
 
     # Creating cursor object using connection object        #%%cursor = sqliteConnection.cursor()
     
@@ -55,11 +89,64 @@ def list_all_cetegories():
     list_of_categories = []
     for item in cursor:
         print( str(item)[2: -3] +", ", end="")
+        list_of_categories.append(str(item)[2: -3])
 
-def add_operation(type):
+    return list_of_categories
+"""
+
+
+def get_all_categories():
+    # read all categories from a_set_of_categories table and retyrn it as a array
+    all_categories = []
+    db.execute( """ SELECT id, genre FROM a_set_of_categories """)
+    temp_data = cursor.execute(""" SELECT genre FROM a_set_of_categories""")
+    for record in temp_data:
+        #print("Record: ", record[0])
+        all_categories.append(record[0])
+
+    type(all_categories)
+    return all_categories
+
+
+
+def add_operation(type_of_transaction):
     # request category
+    if type_of_transaction == "P":
+        print("Add new profit operation:")
+    else:
+        print("Add new loss operation:")
     while True:
-        break
+        check = False
+        # remind categories added previoslu by user
+        print("Existing categories: ", end = "")
+        list_of_categories = []
+        list_of_categories = get_all_categories()
+        
+        for item in list_of_categories:
+            print(item,end="")
+            # when item isn't the last one - add coma
+            if item != ( list_of_categories[len( list_of_categories ) - 1]):
+                print(", ", end="")
+            else:
+                # go to the next line
+                print("")
+        
+        category= input("Category: ")
+        for num in range(0, len(list_of_categories)):
+            # print(list_of_categories[num], " - ", category)
+            if list_of_categories[num] == category:
+                # print(list_of_categories[num], " - ", category)
+                check = True
+                break
+
+        if check == True:
+            break
+        else:
+            print("Category: {} not exist. Try again. ".format(category))
+        
+        
+
+        
     # request description and amount
     while True:
         # checking lenght of description, lenght is reading from dictionary called lenght
@@ -77,11 +164,11 @@ def add_operation(type):
         except ValueError:
             print("Enter a number.\nFor the decimal part, use '.'.")
     # display operation
-    if type == "L":
-        print("Operation: LOSS.")
-    elif type == "P":
-        print("Operation: PROFIT.")
-    print(F"{amount}\t{description}")
+    if type_of_transaction == "L":
+        print("\nOperation: LOSS.")
+    elif type_of_transaction == "P":
+        print("\nOperation: PROFIT.")
+    print(F"{category}\t{description}\t{amount}")
 
     # request confirm or reject operation
     while True:
@@ -89,16 +176,16 @@ def add_operation(type):
         if decision_1.lower() == "yes":
             # save the operation
             print("Your operation will be save.")
-            print(F"{type}\t{amount}\t{description}")
+            print(F"{type_of_transaction}\t{amount}\t{description}")
             # db.execute(""" CREATE TABLE financial_operations(id integer PRIMARY KEY, type char, description TEXT, amount real NOT NULL) """)
             # cursor.execute(""" INSERT INTO ebookstore(ID, TITLE, AUTHOR, QTY) VALUES (?,?,?,?)""", (id, title, author, qty))
-            db.execute(""" INSERT INTO financial_operations(type, description, amount ) VALUES (?, ?, ?) """, (type, description, amount) )
+            db.execute(""" INSERT INTO financial_operations(type, category, description, amount ) VALUES (?, ?, ?, ?) """, (type_of_transaction, category, description, amount) )
 
             break
         elif decision_1.lower()== "no":
             decision_2 = input("Do you want to improve operations? (yes, no): ")
             if decision_2.lower() == "yes":
-                add_operation(type)
+                add_operation(type_of_transaction)
                 break
             elif decision_2.lower() == "no":
                 break
@@ -126,9 +213,10 @@ def print_data(data_):
     print("|no" + ( lenght["id"] - len("no") )* " " + "|type" + ( lenght["type"] - len("type") )  * " " + "|category" + ( lenght["category"] - len("category")) * " "  + "|description" + ( lenght["description"] - len("description") ) * " " + "|amount" + ( lenght["amount"] - len("amount") ) * " " + "|" )
     print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
     for row in data_:
-            print(F"|{row[0]} " + ( lenght["id"] - len(str( row[0] ) ) - 0)* " " + F"|{row[1]}" + ( lenght["type"] - len(str( row[1] )) )  * " " + F"|{row[2]}" + ( lenght["category"] - len(str( row[2]) ) ) * " "  + F"|{row[3]}" + ( lenght["description"] - len(str( row[3]) ) ) * " " +F"|{row[4]}" + ( lenght["amount"] - len(str( row[4] )) ) * " " + "|" ) # - 0 of " "
+            print(F"|{row[0]} " + ( lenght["id"] - len(str( row[0] ) ) - 1)* " " + F"|{row[1]}" + ( lenght["type"] - len(str( row[1] )) )  * " " + F"|{row[2]}" + ( lenght["category"] - len(str( row[2]) ) ) * " "  + F"|{row[3]}" + ( lenght["description"] - len(str( row[3]) ) ) * " " +F"|{row[4]}" + ( lenght["amount"] - len(str( row[4] )) ) * " " + "|" ) # - 1 of " "
             #print(F"| {row[0]} | {row[1]} | {row[2]} | {row[3]} |")
-            print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"] * "-" + "+" + lenght["amount"] * "-" + "+")
+            # print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"] * "-" + "+" + lenght["amount"] * "-" + "+")
+            print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
     input("Press enter to continue.")
     print()
 
@@ -168,7 +256,7 @@ while True:
     if menu_option == "0":
         # save changes in database and close program
         # save databese   
-        list_all_cetegories()
+        # list_all_cetegories()
         db.commit()
         db.close()
         print("Save and exit. Thank you.")
