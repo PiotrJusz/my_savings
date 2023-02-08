@@ -1,14 +1,15 @@
 import sqlite3
+import datetime
 
 # lenght of description used at creating table for display
-lenght = {"id":5, "type":4, "category":15, "description": 30, "amount":10}
+lenght = {"id":5, "date_of_operation":10, "type":4, "category":15, "description": 30, "amount":10}
 
 # open databese from file
 try:
     db = sqlite3.connect("data/database.db")
     cursor = db.cursor()
     try:
-        db.execute(""" CREATE TABLE financial_operations(id integer PRIMARY KEY, type char, category text, description TEXT, amount real NOT NULL) """)
+        db.execute(""" CREATE TABLE financial_operations(id integer PRIMARY KEY, date_of_operation text, type char, category text, description TEXT, amount real NOT NULL) """)
         db.execute(""" CREATE TABLE a_set_of_categories(id integer PRIMARY KEY, genre char)""")
     except:
         print("Can't create main table in database.")
@@ -107,6 +108,31 @@ def get_all_categories():
     type(all_categories)
     return all_categories
 
+def get_current_day():
+    # get date from system and return as string
+    now = datetime.datetime.now()
+    current_time = now.strftime("%Y-%m-%d")
+    return current_time
+
+def add_new_category(new_category):
+    # adding new category in other menu than add category from main menu
+    try:
+        # adding category to database
+        # "cast string into []"
+        new_list = []
+        new_list.append(new_category)
+        db.execute(""" INSERT INTO a_set_of_categories(genre) VALUES (?) """, ( new_list[0][1] ) )
+        print("Category: {} added to database.".format(new_list[0][1]))
+    except Exception as e:
+        # print(repr(e)) 
+        # this name exist in database
+        # request to fix or end adding new category
+        print(e,":",new_list[0][1])
+        print( "Something's wrong. Program will be closed shortly" )
+        exit()
+
+
+
 
 
 def add_operation(type_of_transaction):
@@ -115,6 +141,22 @@ def add_operation(type_of_transaction):
         print("Add new profit operation:")
     else:
         print("Add new loss operation:")
+
+    # request date or put current date
+    while True:
+        date_of = input("Enter the day of operation in format YYYY-MM-DD\nor put enter for current date " + get_current_day() + ": ")
+        if date_of == "":
+            date_of = get_current_day()
+            break
+        else:
+        # checking correct data entry
+            try:
+                date_object = datetime.strptime(date_of, '%Y-%m-%d').date()
+                break
+            except Exception as e:
+                print("Exception: ",e)
+                print("Enter date of operation in format: YYYY-M-D.")
+
     while True:
         check = False
         # remind categories added previoslu by user
@@ -143,6 +185,10 @@ def add_operation(type_of_transaction):
             break
         else:
             print("Category: {} not exist. Try again. ".format(category))
+            decision_3 = input("Add a new category: " + category+" (yes/no): ")
+            if decision_3.lower() == "yes":
+                add_new_category(category)
+                break
         
         
 
@@ -179,7 +225,7 @@ def add_operation(type_of_transaction):
             print(F"{type_of_transaction}\t{amount}\t{description}")
             # db.execute(""" CREATE TABLE financial_operations(id integer PRIMARY KEY, type char, description TEXT, amount real NOT NULL) """)
             # cursor.execute(""" INSERT INTO ebookstore(ID, TITLE, AUTHOR, QTY) VALUES (?,?,?,?)""", (id, title, author, qty))
-            db.execute(""" INSERT INTO financial_operations(type, category, description, amount ) VALUES (?, ?, ?, ?) """, (type_of_transaction, category, description, amount) )
+            db.execute(""" INSERT INTO financial_operations(type, date_of_operation, category, description, amount ) VALUES (?, ?, ?, ?, ?) """, (type_of_transaction, date_of, category, description, amount) )
 
             break
         elif decision_1.lower()== "no":
@@ -209,14 +255,14 @@ def print_data(data_):
 
 def print_data(data_):
     # display header
-    print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
-    print("|no" + ( lenght["id"] - len("no") )* " " + "|type" + ( lenght["type"] - len("type") )  * " " + "|category" + ( lenght["category"] - len("category")) * " "  + "|description" + ( lenght["description"] - len("description") ) * " " + "|amount" + ( lenght["amount"] - len("amount") ) * " " + "|" )
-    print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+    print("+"+lenght["id"] * "-" + "+" + lenght["date_of_operation"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+    print("|no" + ( lenght["id"] - len("no") )* " "+ "|date" + ( lenght["date_of_operation"] - len("date") )* " " + "|type" + ( lenght["type"] - len("type") )  * " " + "|category" + ( lenght["category"] - len("category")) * " "  + "|description" + ( lenght["description"] - len("description") ) * " " + "|amount" + ( lenght["amount"] - len("amount") ) * " " + "|" )
+    print("+"+lenght["id"] * "-" + "+" + lenght["date_of_operation"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
     for row in data_:
-            print(F"|{row[0]} " + ( lenght["id"] - len(str( row[0] ) ) - 1)* " " + F"|{row[1]}" + ( lenght["type"] - len(str( row[1] )) )  * " " + F"|{row[2]}" + ( lenght["category"] - len(str( row[2]) ) ) * " "  + F"|{row[3]}" + ( lenght["description"] - len(str( row[3]) ) ) * " " +F"|{row[4]}" + ( lenght["amount"] - len(str( row[4] )) ) * " " + "|" ) # - 1 of " "
+            print(F"|{row[0]} " + ( lenght["id"] - len(str( row[0] ) ) - 1)* " " + F"|{row[1]}" + ( lenght["date_of_operation"] - len(str( row[1] )) )  * " " +F"|{row[2]}" + ( lenght["type"] - len(str( row[2] )) )  * " " + F"|{row[3]}" + ( lenght["category"] - len(str( row[3]) ) ) * " "  + F"|{row[4]}" + ( lenght["description"] - len(str( row[4]) ) ) * " " +F"|{row[5]}" + ( lenght["amount"] - len(str( row[5] )) ) * " " + "|" ) # - 1 of " "
             #print(F"| {row[0]} | {row[1]} | {row[2]} | {row[3]} |")
             # print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"] * "-" + "+" + lenght["amount"] * "-" + "+")
-            print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+            print("+"+lenght["id"] * "-" + "+" + lenght["date_of_operation"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
     input("Press enter to continue.")
     print()
 
@@ -250,8 +296,8 @@ while True:
         add_category()
 
     elif menu_option == "10":
-        db.execute(""" SELECT id, type,  category, description, amount FROM financial_operations """)
-        print_data( cursor.execute(""" SELECT id, type, category,  description, amount from financial_operations  """) )
+        db.execute(""" SELECT id, date_of_operation, type,  category, description, amount FROM financial_operations """)
+        print_data( cursor.execute(""" SELECT id, date_of_operation, type, category,  description, amount from financial_operations  """) )
     
     if menu_option == "0":
         # save changes in database and close program
