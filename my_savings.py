@@ -2,7 +2,7 @@ import sqlite3
 import datetime
 
 # lenght of description used at creating table for display
-lenght = {"id":5, "date_of_operation":10, "type":4, "category":15, "description": 30, "amount":10}
+lenght = {"id":5, "date_of_operation":10, "type":4, "category":25, "description": 40, "amount":10}
 
 # open databese from file
 try:
@@ -18,32 +18,6 @@ except Exception:
     print("Something's wrong.\nCan't create or open database.\nEnd of program.")
     exit()
 
-
-
-"""
-def add_category():
-    while True:
-        # add a category to the database
-        # request the name and type of category
-        category_name = input("Enter the name of category: ")
-        #category_type = input("Type of category:\nP - profit type,\nL - loss type\nType: ")
-
-        # depends of category tape - create a new category in proper database
-        try:
-            #cursor.execute(""" """CREATE TABLE {}(id integer PRIMARY KEY, type char, category text, description TEXT, amount real)""" """.format(category_name))
-            break
-        except Exception:
-            # this name exist in database
-            # request to fix or end adding new category
-            print( "This category:'{}' already exist.".format(category_name) )
-            decision = input("Try again? yes/no ").lower()
-            if decision == "no":
-                break
-            elif decision != "yes" and decision != "no":
-                print("Back to main menu.")
-                break
-"""
-
 # creating or adding category to database stored category
 def add_category():
     while True:
@@ -51,7 +25,7 @@ def add_category():
         # request the name and type of category
         # category name is list type - then is a agument in searching in database
         category_name = []
-        print("Add a  ategory. Enter '0'(zero) to interapt and back to main menu. ")
+        print("Add a category. Enter '0'(zero) to interapt and back to main menu. ")
         category_name.append( input("Enter the name of category: ") )
         if category_name == "0":
             # back to main menu - user interapt adding category
@@ -75,37 +49,18 @@ def add_category():
                     break
             
 
-"""
-def list_all_cetegories():
-    # Getting all tables from sqlite_master
-    sql_query = """"SELECT name FROM sqlite_master WHERE type='table';""""
-
-    # Creating cursor object using connection object        #%%cursor = sqliteConnection.cursor()
-    
-    # executing our sql query
-    cursor.execute(sql_query)
-    
-    # printing all categories
-
-    list_of_categories = []
-    for item in cursor:
-        print( str(item)[2: -3] +", ", end="")
-        list_of_categories.append(str(item)[2: -3])
-
-    return list_of_categories
-"""
-
-
 def get_all_categories():
     # read all categories from a_set_of_categories table and retyrn it as a array
     all_categories = []
-    db.execute( """ SELECT id, genre FROM a_set_of_categories """)
+    db.execute( """ SELECT genre FROM a_set_of_categories """)
     temp_data = cursor.execute(""" SELECT genre FROM a_set_of_categories""")
     for record in temp_data:
         #print("Record: ", record[0])
         all_categories.append(record[0])
-
-    type(all_categories)
+    print("Test for get_all_categories function:")
+    print("all_categories: ", type(all_categories) )
+    print("all_categories: ", all_categories)
+    input()
     return all_categories
 
 def get_current_day():
@@ -121,19 +76,15 @@ def add_new_category(new_category):
         # "cast string into []"
         new_list = []
         new_list.append(new_category)
-        db.execute(""" INSERT INTO a_set_of_categories(genre) VALUES (?) """, ( new_list[0][1] ) )
-        print("Category: {} added to database.".format(new_list[0][1]))
+        db.execute(""" INSERT INTO a_set_of_categories(genre) VALUES (?) """, ( new_list ) )
+        print("Category: {} added to database.".format(new_list[0]))
     except Exception as e:
         # print(repr(e)) 
         # this name exist in database
         # request to fix or end adding new category
-        print(e,":",new_list[0][1])
+        print(e,":",new_list)
         print( "Something's wrong. Program will be closed shortly" )
         exit()
-
-
-
-
 
 def add_operation(type_of_transaction):
     # request category
@@ -151,7 +102,7 @@ def add_operation(type_of_transaction):
         else:
         # checking correct data entry
             try:
-                date_object = datetime.strptime(date_of, '%Y-%m-%d').date()
+                date_object = datetime.datetime.strptime(date_of, '%Y-%m-%d').date()
                 break
             except Exception as e:
                 print("Exception: ",e)
@@ -189,9 +140,6 @@ def add_operation(type_of_transaction):
             if decision_3.lower() == "yes":
                 add_new_category(category)
                 break
-        
-        
-
         
     # request description and amount
     while True:
