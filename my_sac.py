@@ -123,7 +123,7 @@ def add_operation(type_of_transaction):
                 # go to the next line
                 print("")
         
-        category= input("\nCategory: ")
+        category= input("Category: ")
         for num in range(0, len(list_of_categories)):
             # print(list_of_categories[num], " - ", category)
             if list_of_categories[num] == category:
@@ -161,7 +161,7 @@ def add_operation(type_of_transaction):
         print("\nOperation: LOSS.")
     elif type_of_transaction == "P":
         print("\nOperation: PROFIT.")
-    print(F"Category: {category}\tDescription: {description}\tAmount: \t{amount}")
+    print(F"Category: {category}\tDescription: {description}Amount: \t{amount}")
 
     # request confirm or reject operation
     while True:
@@ -257,10 +257,7 @@ def display_summary(type_of_transaction):
             print_table_sum(profit_loss, "profit / loss:")
             # print("Profits: ", profit_record, end = "")
             # print("\tLosses: ", loss_record)
-    if type_of_transaction == "LP" and profit_record[0] == None and loss_record[0] != None: # display only losses
-        print_table_sum(loss_record, "Sum of losses:")
-    elif type_of_transaction == "LP" and profit_record[0] != None and loss_record[0] == None: # display only profits
-        print_table_sum(profit_record, "Sum of profit:")
+        elif type_of_transaction == "LP" and 
 
 def print_table_sum(data_, text_in):    # print bottom table for sum
     # print("|" + ( (lenght["id"] + lenght["date_of_operation"] + lenght["type"] + lenght["category"]) * " " ) + 3 * " " + "|" + text_in + ( (lenght["description"] - len(text_in)) * " ") + "|" + str(data_[0]) + (lenght["amount"] - len(str(data_[0])) ) * " " + "|")
