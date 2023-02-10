@@ -6,7 +6,7 @@ lenght = {"id":5, "date_of_operation":10, "type":4, "category":25, "description"
 
 # open databese from file
 try:
-    db = sqlite3.connect("data/database_test.db")
+    db = sqlite3.connect("data/database.db")
     cursor = db.cursor()
     try:
         db.execute(""" CREATE TABLE financial_operations(id integer PRIMARY KEY, date_of_operation text, type char, category text, description TEXT, amount real NOT NULL) """)
