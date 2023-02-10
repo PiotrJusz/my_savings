@@ -6,11 +6,11 @@ lenght = {"id":5, "date_of_operation":10, "type":4, "category":25, "description"
 
 # open databese from file
 try:
-    db = sqlite3.connect("data/database.db")
+    db = sqlite3.connect("data/database_test.db")
     cursor = db.cursor()
     try:
         db.execute(""" CREATE TABLE financial_operations(id integer PRIMARY KEY, date_of_operation text, type char, category text, description TEXT, amount real NOT NULL) """)
-        db.execute(""" CREATE TABLE a_set_of_categories(id integer PRIMARY KEY, genre char)""")
+        db.execute(""" CREATE TABLE a_set_of_categories(id integer PRIMARY KEY, genre TEXT NOT NULL UNIQUE)""")
     except:
         print("Can't create main table in database.")
         print("Table probably exist.")
@@ -57,10 +57,10 @@ def get_all_categories():
     for record in temp_data:
         #print("Record: ", record[0])
         all_categories.append(record[0])
-    print("Test for get_all_categories function:")
-    print("all_categories: ", type(all_categories) )
-    print("all_categories: ", all_categories)
-    input()
+    # print("Test for get_all_categories function:")
+    # print("all_categories: ", type(all_categories) )
+    # print("all_categories: ", all_categories)
+    # input()
     return all_categories
 
 def get_current_day():
@@ -114,7 +114,6 @@ def add_operation(type_of_transaction):
         print("Existing categories: ", end = "")
         list_of_categories = []
         list_of_categories = get_all_categories()
-        
         for item in list_of_categories:
             print(item,end="")
             # when item isn't the last one - add coma
@@ -124,7 +123,7 @@ def add_operation(type_of_transaction):
                 # go to the next line
                 print("")
         
-        category= input("Category: ")
+        category= input("\nCategory: ")
         for num in range(0, len(list_of_categories)):
             # print(list_of_categories[num], " - ", category)
             if list_of_categories[num] == category:
@@ -162,7 +161,7 @@ def add_operation(type_of_transaction):
         print("\nOperation: LOSS.")
     elif type_of_transaction == "P":
         print("\nOperation: PROFIT.")
-    print(F"{category}\t{description}\t{amount}")
+    print(F"Category: {category}\tDescription: {description}\tAmount: \t{amount}")
 
     # request confirm or reject operation
     while True:
@@ -186,20 +185,6 @@ def add_operation(type_of_transaction):
             else:
                 print("Give the correct answer? (yes, no)")
 
-"""
-# no category
-def print_data(data_):
-    # display header
-    print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
-    print("|no" + ( lenght["id"] - len("no") )* " " + "|type" + ( lenght["type"] - len("type") )  * " "  + "|description" + ( lenght["description"] - len("description") ) * " " +"|amount" + ( lenght["amount"] - len("amount") ) * " " + "|" )
-    print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
-    for row in data_:
-            print(F"|{row[0]} " + ( lenght["id"] - len(str( row[0] ) ) - 1)* " " + F"|{row[1]}" + ( lenght["type"] - len(str( row[1] )) )  * " "  + F"|{row[2]}" + ( lenght["description"] - len(str( row[2]) ) ) * " " +F"|{row[3]}" + ( lenght["amount"] - len(str( row[3] )) ) * " " + "|" ) # - 1 of " "
-            #print(F"| {row[0]} | {row[1]} | {row[2]} | {row[3]} |")
-            print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"] * "-" + "+" + lenght["amount"] * "-" + "+")
-    input("Press enter to continue.")
-    print()
-"""
 
 def print_data(data_):
     # display header
@@ -214,7 +199,98 @@ def print_data(data_):
     input("Press enter to continue.")
     print()
 
-# ****************MAIN*********************************
+def print_data_for_continue(data_):
+    # display header
+    print("+"+lenght["id"] * "-" + "+" + lenght["date_of_operation"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+    print("|no" + ( lenght["id"] - len("no") )* " "+ "|date" + ( lenght["date_of_operation"] - len("date") )* " " + "|type" + ( lenght["type"] - len("type") )  * " " + "|category" + ( lenght["category"] - len("category")) * " "  + "|description" + ( lenght["description"] - len("description") ) * " " + "|amount" + ( lenght["amount"] - len("amount") ) * " " + "|" )
+    print("+"+lenght["id"] * "-" + "+" + lenght["date_of_operation"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+    for row in data_:
+            print(F"|{row[0]} " + ( lenght["id"] - len(str( row[0] ) ) - 1)* " " + F"|{row[1]}" + ( lenght["date_of_operation"] - len(str( row[1] )) )  * " " +F"|{row[2]}" + ( lenght["type"] - len(str( row[2] )) )  * " " + F"|{row[3]}" + ( lenght["category"] - len(str( row[3]) ) ) * " "  + F"|{row[4]}" + ( lenght["description"] - len(str( row[4]) ) ) * " " +F"|{row[5]}" + ( lenght["amount"] - len(str( row[5] )) ) * " " + "|" ) # - 1 of " "
+            #print(F"| {row[0]} | {row[1]} | {row[2]} | {row[3]} |")
+            # print("+"+lenght["id"] * "-" + "+" + lenght["type"] * "-" + "+" + lenght["description"] * "-" + "+" + lenght["amount"] * "-" + "+")
+            print("+"+lenght["id"] * "-" + "+" + lenght["date_of_operation"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+
+
+def display_summary(type_of_transaction):
+    # display transaction by print_data function
+    if type_of_transaction == "LP": # gather data for all operations and display them
+        db.execute(""" SELECT id, date_of_operation, type,  category, description, amount FROM financial_operations """)
+        print_data_for_continue( cursor.execute(""" SELECT id, date_of_operation, type, category,  description, amount from financial_operations  """) )
+    else:   # gather data for operations depend from a type_of_transaction and diplay them
+        db.execute(""" SELECT id, date_of_operation, type,  category, description, amount FROM financial_operations WHERE type = ?""", (type_of_transaction))
+        print_data_for_continue( cursor.execute(""" SELECT id, date_of_operation, type, category,  description, amount from financial_operations  WHERE type = ?""", (type_of_transaction)) )
+
+    # variable used for store sum of profits and losses
+    profit_record = []
+    loss_record = []
+
+    # count sum of profits operations and store it in variable called profit_record
+    db.execute(""" SELECT  SUM(amount) FROM financial_operations WHERE type = ? """, ("P",))
+    data_profit = cursor.execute(""" SELECT  SUM(amount) FROM financial_operations WHERE type is 'P' """)
+    for profit_record in data_profit:
+        profit_record = profit_record
+
+    # count sum of losses operations and store it in variable called loss_record
+    db.execute(""" SELECT  SUM(amount) FROM financial_operations WHERE type = ? """,("L",))
+    data_loss = cursor.execute(""" SELECT  SUM(amount) FROM financial_operations WHERE type is 'L' """)
+    for loss_record in data_loss:
+        loss_record = loss_record
+
+    # if database is empty do nothing
+    if profit_record[0] != None:
+        if type_of_transaction == "P":  # collect all amount from profit-type operation 
+            # print table with sum of profit operations
+            print_table_sum(profit_record, "Sum of profits:")   
+            # print("Sum is: ", profit_record)
+    if loss_record[0] != None:
+        if (type_of_transaction == "L"):   # collect all Loss amount
+            # display result
+            # print table with lsum of osses operations 
+            print_table_sum(loss_record, "Sum of losses:")
+            # print("Sum is: ", loss_record)
+    if profit_record[0] != None and loss_record[0] != None:
+        if type_of_transaction == "LP": # print sum Profit and Loss operation
+            print_table_sum(profit_record, "Sum of profits:")  
+            print_table_sum(loss_record, "Sum of losses:")
+            profit_loss = []
+            profit_loss.append(profit_record [0]- loss_record[0])
+            print_table_sum(profit_loss, "profit / loss:")
+            # print("Profits: ", profit_record, end = "")
+            # print("\tLosses: ", loss_record)
+    if type_of_transaction == "LP" and profit_record[0] == None and loss_record[0] != None: # display only losses
+        print_table_sum(loss_record, "Sum of losses:")
+    elif type_of_transaction == "LP" and profit_record[0] != None and loss_record[0] != None: # display only profits
+        print_table_sum(profit_record, "Sum of losses:")
+
+def print_table_sum(data_, text_in):    # print bottom table for sum
+    # print("|" + ( (lenght["id"] + lenght["date_of_operation"] + lenght["type"] + lenght["category"]) * " " ) + 3 * " " + "|" + text_in + ( (lenght["description"] - len(text_in)) * " ") + "|" + str(data_[0]) + (lenght["amount"] - len(str(data_[0])) ) * " " + "|")
+    # print("+"+lenght["id"] * "-" + "+" + lenght["date_of_operation"] * "-" + "+" + lenght["type"] * "-" + "+" +lenght["category"] * "-" + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+    # version 2
+    # print("TEST:\ntype of data_: ",type(data_))
+    # print("Test:\ndata_ = ", data_)
+    if data_[0] != None:
+        print(" " + ( (lenght["id"] + lenght["date_of_operation"] + lenght["type"] + lenght["category"]) * " " ) + 3 * " " + "|" + text_in + ( (lenght["description"] - len(text_in)) * " ") + "|" + str( round(data_[0], 2) ) + ( (lenght["amount"] - len( str( round(data_[0], 2))) ) * " " )  + "|") 
+        print(" "+lenght["id"] * " " + " " + lenght["date_of_operation"] * " " + " " + lenght["type"] * " " + " " +lenght["category"] * " " + "+" + lenght["description"]* "-" + "+" + lenght["amount"] * "-" + "+")
+        
+
+    
+      
+        #db.execute(""" SELECT id, date_of_operation, type,  category, description, amount FROM financial_operations """)
+        #print_data( cursor.execute(""" SELECT id, date_of_operation, type, category,  description, amount from financial_operations  """) )
+        #db.execute(""" SELECT  SUM(amount) FROM finacial_operation WHEN category is "P" """)
+        #profit_summary = db.execute(""" SELECT  SUM(amount) FROM finacial_operation WHEN category is "P" """)
+        #loss_summary = db.execute(""" SELECT  SUM(amount) FROM finacial_operation WHEN category is "L" """)
+
+def save_and_exit():
+    # save changes in database and close program
+    # save databese   
+    # list_all_cetegories()
+    db.commit()
+    db.close()
+    print("Save and exit. Thank you.")
+    exit()      
+
+# ****************MAIN*********************************@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # display welcome mesage
 print("""\nHello in 'My Savings' console program.
@@ -244,18 +320,43 @@ while True:
         add_category()
 
     elif menu_option == "10":
-        db.execute(""" SELECT id, date_of_operation, type,  category, description, amount FROM financial_operations """)
-        print_data( cursor.execute(""" SELECT id, date_of_operation, type, category,  description, amount from financial_operations  """) )
+        while True:
+            # menu of accounts summary
+            # reqesust action
+            decision = input("""\t
+            11 - View profit and loss summary with all operations,
+            12 - view profit summary with all operations,
+            13 - view loss sumary with all operations,
+            1 - back to main menu,
+            0 - save and exit:\t""")
+            
+            if decision == "11":
+                # display of summary loss and profit operation
+                display_summary("LP")
+            elif decision == "12":
+                # display of summary loss and profit operation
+                display_summary("P")
+            elif decision == "13":
+                # display of summary loss and profit operation
+                display_summary("L")
+            elif decision == "1": # back to main menu
+                break
+            elif decision == "0": #s ave and exit
+                save_and_exit()
+            else:
+                print("Enter the properly number of action or '1' to back to main menu.")
+
     
     if menu_option == "0":
-        # save changes in database and close program
-        # save databese   
-        # list_all_cetegories()
-        db.commit()
-        db.close()
-        print("Save and exit. Thank you.")
-        exit()
+        save_and_exit()
 
     else:
         # entered number isn't correct
         print("\nEnter the activity number located on the left side of the menu\nor enter 0 to end the program.")
+"""
+        TASK_1: test action of display profit and loss
+        TASK_2: Marge with main branch
+        TASK_3: Beers? ohh, i forgot, you not drink beers.  
+
+"""
+        
