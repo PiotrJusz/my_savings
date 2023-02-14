@@ -32,15 +32,16 @@ def add_category():
             break
         else:
             try:
-                # adding category to database
-                db.execute(""" INSERT INTO a_set_of_categories(genre) VALUES (?) """, ( category_name ) )
+                # adding categ""ory to database
+                db.execute(""" SELECT genre from a_set_of_categories""")
+                cursor.execute(""" INSERT INTO a_set_of_categories(genre) VALUES (?) """, ( category_name ) )
                 print("Category: {} added to database.".format(category_name))
                 break
             except Exception as e:
-                # print(repr(e)) 
+                print(repr(e)) 
                 # this name exist in database
                 # request to fix or end adding new category
-                print( "This category:'{}' already exist.".format(category_name) )
+                print( "This category:{} already exist.".format(category_name) )
                 decision = input("Try again? yes/no ").lower()
                 if decision == "no":
                     break
@@ -305,6 +306,7 @@ while True:
     2 - add new cost,
     3 - add new categories
     10 - display ...,
+    20 - Rename ...,
     0 - save and exit.""")
     menu_option = input("Enter the number of activity: ")
 
@@ -346,6 +348,59 @@ while True:
             else:
                 print("Enter the properly number of action or '1' to back to main menu.")
 
+    # menu for rename's categoty
+    elif menu_option == "20":
+        while(True):
+            decision = input("""\t\t21 - Rename category,
+            \t1 - back to main menu,
+            \tEnter the number of activity:\t""")
+            
+            if decision == "21": # rebane category bname here
+                # display all categories
+                list_of_categories = []
+                list_of_categories = get_all_categories()
+                print("Categories already used in:")
+                if list_of_categories == None:
+                    print("There aren't any categories.")
+                else:
+                    for item_category in list_of_categories:
+                        print(item_category, end = "")
+                        if item_category == list_of_categories[-1]:
+                            print("")   # go to next line
+                        else:
+                            print(", ", end = "")
+
+                    # request to enter category which names will be change
+                    rename_category = input("Enter the name of category which names you want change: ")
+                    if rename_category in list_of_categories:
+                        new_category_name = input(F"Enter the new name for {rename_category}: ")
+                        categories = []
+                        categories.append(new_category_name)
+                        categories.append(rename_category)
+                        # rename category's name
+                        try:
+
+                            # id integer PRIMARY KEY, date_of_operation text, type char, category text, description TEXT, amount real NOT NULL) """)
+                            db.execute(""" SELECT id, genre from a_set_of_categories WHERE genre = ?""",(categories[0][1]))
+                            cursor.execute("""UPDATE a_set_of_categories SET genre = ? WHERE genre = ?""",(categories))
+                            # update financial_operation database
+                            db.execute(""" SELECT  id, category from financial_operations where category = ?""",(categories[0][1]))
+                            cursor.execute(""" UPDATE financial_operations SET category = ? WHERE category = ?""", (categories))
+                            print("Category's name is changed.")
+                        except Exception as e:
+                            print(e)
+                            print(new_category_name + " already exist.")
+                            # print("categories: ", categories)
+                    else:
+                        print("This category not exist.")
+            elif decision == "1":
+                print("Back to main menu")
+                break
+            else:
+                print("Enter the properly number of action or '1' to back to main menu.")
+                
+
+
     
     if menu_option == "0":
         save_and_exit()
@@ -354,9 +409,16 @@ while True:
         # entered number isn't correct
         print("\nEnter the activity number located on the left side of the menu\nor enter 0 to end the program.")
 """
-        TASK_1: test action of display profit and loss
-        TASK_2: Marge with main branch
-        TASK_3: Beers? ohh, i forgot, you not drink beers.  
+        TASK_1: Deleting empty categories 50
+        TASK_2: Rename categories (update datavase with new name) 20 DONE
+                IntegrityError - when new name exist in database - make code for it DONE
+        TASK_3: Editing operation 30
+        TASK_4: Write to the txt file (?) 40
+        TASK_5: make function when display categories - this code is already two times in
+        TASK_6: rename category - if category name is the same like category already using - ask user to join categories
+                update table of categories
+                update table of financial_operations
+        TASK_7: add save_database i place when data shoul be saved
 
 """
         
