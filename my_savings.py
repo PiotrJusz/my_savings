@@ -410,8 +410,6 @@ while True:
         print("\nEnter the activity number located on the left side of the menu\nor enter 0 to end the program.")
 """
         TASK_1: Deleting empty categories 50
-        TASK_2: Rename categories (update datavase with new name) 20 DONE
-                IntegrityError - when new name exist in database - make code for it DONE
         TASK_3: Editing operation 30
         TASK_4: Write to the txt file (?) 40
         TASK_5: make function when display categories - this code is already two times in
@@ -419,6 +417,9 @@ while True:
                 update table of categories
                 update table of financial_operations
         TASK_7: add save_database i place when data shoul be saved
+        DONE:
+        TASK_2: Rename categories (update datavase with new name) 20 
+                IntegrityError - when new name exist in database - make code for it 
 
 """
         
