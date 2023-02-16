@@ -48,6 +48,8 @@ def add_category():
                 elif decision != "yes" and decision != "no":
                     print("Back to main menu.")
                     break
+        # save changes to database
+        save()
             
 
 def get_all_categories():
@@ -86,6 +88,8 @@ def add_new_category(new_category):
         print(e,":",new_list)
         print( "Something's wrong. Program will be closed shortly" )
         exit()
+    # save changes to database
+    save()
 
 def add_operation(type_of_transaction):
     # request category
@@ -185,6 +189,8 @@ def add_operation(type_of_transaction):
                 break
             else:
                 print("Give the correct answer? (yes, no)")
+    # save changes in database
+    save()
 
 
 def print_data(data_):
@@ -282,6 +288,48 @@ def print_table_sum(data_, text_in):    # print bottom table for sum
         #profit_summary = db.execute(""" SELECT  SUM(amount) FROM finacial_operation WHEN category is "P" """)
         #loss_summary = db.execute(""" SELECT  SUM(amount) FROM finacial_operation WHEN category is "L" """)
 
+def rename_category():
+    # display all categories
+    list_of_categories = []
+    list_of_categories = get_all_categories()
+    print("Categories already used in:")
+    if list_of_categories == None:
+        print("There aren't any categories.")
+    else:
+        for item_category in list_of_categories:
+            print(item_category, end = "")
+            if item_category == list_of_categories[-1]:
+                print("")   # go to next line
+            else:
+                print(", ", end = "")
+
+        # request to enter category which names will be change
+        rename_category = input("Enter the name of category which names you want change: ")
+        if rename_category in list_of_categories:
+            new_category_name = input(F"Enter the new name for {rename_category}: ")
+            categories = []
+            categories.append(new_category_name)
+            categories.append(rename_category)
+            # rename category's name
+            try:
+
+                # id integer PRIMARY KEY, date_of_operation text, type char, category text, description TEXT, amount real NOT NULL) """)
+                db.execute(""" SELECT id, genre from a_set_of_categories WHERE genre = ?""",(categories[0][1]))
+                cursor.execute("""UPDATE a_set_of_categories SET genre = ? WHERE genre = ?""",(categories))
+                # update financial_operation database
+                db.execute(""" SELECT  id, category from financial_operations where category = ?""",(categories[0][1]))
+                cursor.execute(""" UPDATE financial_operations SET category = ? WHERE category = ?""", (categories))
+                print("Category's name is changed.")
+            except Exception as e:
+                print(e)
+                print(new_category_name + " already exist.")
+                # print("categories: ", categories)
+        else:
+            print("This category not exist.")
+
+def save():
+    db.commit()
+
 def save_and_exit():
     # save changes in database and close program
     # save databese   
@@ -355,44 +403,10 @@ while True:
             \t1 - back to main menu,
             \tEnter the number of activity:\t""")
             
-            if decision == "21": # rebane category bname here
-                # display all categories
-                list_of_categories = []
-                list_of_categories = get_all_categories()
-                print("Categories already used in:")
-                if list_of_categories == None:
-                    print("There aren't any categories.")
-                else:
-                    for item_category in list_of_categories:
-                        print(item_category, end = "")
-                        if item_category == list_of_categories[-1]:
-                            print("")   # go to next line
-                        else:
-                            print(", ", end = "")
+            if decision == "21": # rename category bname here
+                # rename categor
+                rename_category()
 
-                    # request to enter category which names will be change
-                    rename_category = input("Enter the name of category which names you want change: ")
-                    if rename_category in list_of_categories:
-                        new_category_name = input(F"Enter the new name for {rename_category}: ")
-                        categories = []
-                        categories.append(new_category_name)
-                        categories.append(rename_category)
-                        # rename category's name
-                        try:
-
-                            # id integer PRIMARY KEY, date_of_operation text, type char, category text, description TEXT, amount real NOT NULL) """)
-                            db.execute(""" SELECT id, genre from a_set_of_categories WHERE genre = ?""",(categories[0][1]))
-                            cursor.execute("""UPDATE a_set_of_categories SET genre = ? WHERE genre = ?""",(categories))
-                            # update financial_operation database
-                            db.execute(""" SELECT  id, category from financial_operations where category = ?""",(categories[0][1]))
-                            cursor.execute(""" UPDATE financial_operations SET category = ? WHERE category = ?""", (categories))
-                            print("Category's name is changed.")
-                        except Exception as e:
-                            print(e)
-                            print(new_category_name + " already exist.")
-                            # print("categories: ", categories)
-                    else:
-                        print("This category not exist.")
             elif decision == "1":
                 print("Back to main menu")
                 break
