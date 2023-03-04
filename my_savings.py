@@ -1,5 +1,8 @@
 import sqlite3
 import datetime
+import matplotlib.pyplot as plt
+from pylab import plot, show, legend, title, xlabel, ylabel, axis
+import budget_chart_horizontal_package as bch
 
 # lenght of description used at creating table for display
 lenght = {"id":5, "date_of_operation":10, "type":4, "category":25, "description": 40, "amount":10}
@@ -339,6 +342,189 @@ def save_and_exit():
     print("Save and exit. Thank you.")
     exit()      
 
+def collect_data_for_create_graph(type_of_transaction):
+    """ type_of_transaction = LP for Losses and Profits,
+        type_of_transaction = L for only losses,
+        type_of_transaction = P for only profits
+    """
+    """
+    graph for year (months from 1 to 12)
+    every month is a sum of all profits or losses
+    """
+    months = [] # list of months from 1 -12
+    months = range(1,13)
+    profit_record = []
+    loss_record = []
+
+    # extraction data from database
+    if (type_of_transaction == "LP" or type_of_transaction == "L"):
+        # colecting data for 'L' transaction
+        db.execute(""" SELECT  SUM(amount) FROM financial_operations WHERE type = ? """,("L",))
+        data_loss = cursor.execute(""" SELECT  SUM(amount) FROM financial_operations WHERE type is 'L' """)
+        for record in data_loss:
+            amount_2 = float(record[0])
+            
+
+
+        
+
+    
+    if (type_of_transaction == "LP" or type_of_transaction == "P"):
+        # colecting data for 'P' transaction
+        db.execute(""" SELECT  SUM(amount) FROM financial_operations WHERE type = ? """,("P",))
+        data_profit = cursor.execute(""" SELECT  SUM(amount) FROM financial_operations WHERE type is 'P' """)
+        for record in data_profit:
+            # profit_record.append(["Profits", record[0]])
+            amount_1 = float(record[0])
+
+
+    
+
+    # creating data for chart - horizontal
+    # [name of account, sum]
+    #
+    profit_record.append("Profits")
+    profit_record.append(amount_1)
+    loss_record.append("Losses")
+    loss_record.append(amount_2)
+    chart_data = []
+    chart_data.append(profit_record)
+    chart_data.append(loss_record)
+    bch.create_graph_chart(chart_data)
+    
+
+    # create graph
+    """
+    x_numbers = [1, 2, 3]
+    y_numbers = [2, 4, 6]
+    plt.plot(x_numbers, y_numbers,marker = "+")
+    legend(["X"],["Y"])
+    title("Plot")
+    xlabel("xlabel")
+    ylabel("ylabel")
+    axis([0,4,1,7])
+
+    plt.savefig("plot.png")
+    plt.show()
+    """
+# extract data from cursor.execute
+
+def extract_data(data_, number_of_columns):
+    extracted_data = []
+    temp_extracted_data = []
+    for record in data_:
+        # test: print("record: ", record)
+        extracted_data.append(record[number_of_columns])
+    # print("extractrd_data: ", extracted_data)
+    # print(extracted_data[0])
+    # test: input()
+    
+
+    # return list [record1, record1,...] if numbers_of_column == 1 and list [[record1], [record2], ...] if numbers_of_columns > 1
+    return extracted_data
+
+
+
+def edit_operation():
+    # edit one operation by ID
+    while True:
+        id_of_operation = input("Enter the unique number of operation for edit.\nTo exit to main menu enter '0',\nTo display all operation enter 'all',\nEnter the action: ")
+        if id_of_operation == "0":
+            # back to main menu
+            break
+        elif id_of_operation.lower() == "all":
+            # display all operation
+            display_summary("LP")
+            # pass
+        else:
+            # received number of operation to edit
+            # or random text
+            # read database to get unique ID
+            all_IDs = [] # stored all ids extracted from ids
+            ids = [] # stored all id's from database
+            db.execute(""" SELECT * from financial_operations""")
+            ids = cursor.execute(""" SELECT id, amount FROM financial_operations WHERE id > 0""")            
+            all_IDs = extract_data(ids, 0) # 0 0  - extract only numbers of id from database
+            try:
+                if int(id_of_operation) in  all_IDs:
+                    # break
+                    # edit operation here
+                    # db.execute(""" SELECT * from financial_operations""")
+                    operation = []
+                    # print("operation_data: ", operation_data)
+                    option = input("""Edit menu:
+                    31 - change date,
+                    32 - change type,
+                    33 - change category,
+                    34 - change description,
+                    35 - change amount,
+                    36 - delete operation,
+                    0 - back to main menu
+                    Your choice: 
+                    """)
+                    if option == "0":
+                        break
+                    if option == "35":
+                        # change amount
+                        # access to datavbase to tet amount
+                        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+                        operation = cursor.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+                        # extract data from operation
+                        operation_data = ""
+                        operation_data = extract_data(operation, 5)
+
+                        # access to database to display edited operation
+                        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+                        operation = cursor.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+                        print_data(operation)
+                        print("Current amount: ",operation_data[0])
+                        temp_amount = check_is_datatype ("float", "New amount: ")
+
+                        # access to database to update amount
+                        # update database - change amount
+                        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+                        operation = cursor.execute(""" Update  financial_operations SET amount = ? WHERE id = ? """,(temp_amount,  id_of_operation,))
+                        save()
+                        
+                    if option == "36":
+                        # delete operation
+                        ask = input(F"Deleting operation with id {id_of_operation}.\nAre You sure? (yes/no): ")
+                        if ask.lower() == "yes":
+                             cursor.execute("DELETE FROM financial_operations WHERE id = ?",(id_of_operation,))
+                             print("Entered record was deleted.")
+
+                    save()
+                    
+
+
+                else:
+                    print("Unfortunately, there are no operations at this number. Try again.")
+            except ValueError:
+                print("Something's wrong. Try again.")
+
+
+def check_is_datatype(datatype, question):
+    while True:
+        # float temp_data
+        temp_data = 0.00
+        if datatype == "float":
+            try:
+                temp_data = float(input(question))
+                break
+            except ValueError:
+                print("Something's wrong. Try again. Enter properly value.")
+
+    return round(temp_data, 2)          
+
+            
+            
+
+        
+        
+
+
+
+
 # ****************MAIN*********************************@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # display welcome mesage
@@ -355,6 +541,7 @@ while True:
     3 - add new categories
     10 - display ...,
     20 - Rename ...,
+    30 - Edit operation by number ID,
     0 - save and exit.""")
     menu_option = input("Enter the number of activity: ")
 
@@ -375,8 +562,11 @@ while True:
             # reqesust action
             decision = input("""\t
             11 - View profit and loss summary with all operations,
+            11p - View profit and loss summary with all operations on graph,
             12 - view profit summary with all operations,
+            12p - view profit summary with all operations on graph,
             13 - view loss sumary with all operations,
+            13p - view loss sumary with all operations on graph,
             1 - back to main menu,
             0 - save and exit:\t""")
             
@@ -389,6 +579,12 @@ while True:
             elif decision == "13":
                 # display of summary loss and profit operation
                 display_summary("L")
+
+            # graph
+            elif decision == "11p":
+                # create graph for profits and losses
+                collect_data_for_create_graph("LP")
+
             elif decision == "1": # back to main menu
                 break
             elif decision == "0": #s ave and exit
@@ -412,28 +608,16 @@ while True:
                 break
             else:
                 print("Enter the properly number of action or '1' to back to main menu.")
+
+    elif menu_option == "30":
+        # edit one operation by number ID
+        edit_operation()
                 
 
 
     
     if menu_option == "0":
         save_and_exit()
-
     else:
         # entered number isn't correct
         print("\nEnter the activity number located on the left side of the menu\nor enter 0 to end the program.")
-"""
-        TASK_1: Deleting empty categories 50
-        TASK_3: Editing operation 30
-        TASK_4: Write to the txt file (?) 40
-        TASK_5: make function when display categories - this code is already two times in
-        TASK_6: rename category - if category name is the same like category already using - ask user to join categories
-                update table of categories
-                update table of financial_operations
-        TASK_7: add save_database i place when data shoul be saved
-        DONE:
-        TASK_2: Rename categories (update datavase with new name) 20 
-                IntegrityError - when new name exist in database - make code for it 
-
-"""
-        

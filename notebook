@@ -1,0 +1,18 @@
+        TASK_1: Deleting empty categories 50
+        TASK_3: Editing operation 30
+                Adding to main menu position 30 - editing
+                Adding edit_operation - requestein user for number of operation, checking it abd nake properk=ly answer,
+                Adding function extract_data(cursor) to extract data and stored in list
+                Still editing fynction edit_operation, adding error handling, returning to main menu (enter 0), display all operation(enter all), checking entered number of operation is correct
+                
+                WORKING HERE
+        TASK_4: Write to the txt file (?) 40
+        TASK_5: make function when display categories - this code is already two times in
+        TASK_6: rename category - if category name is the same like category already using - ask user to join categories
+                update table of categories
+                update table of financial_operations
+        TASK_7: add save_database i place when data should be saved
+        TASK 2: make a plots of profits and losses (10)
+                changed function create_graph(type_of_transaction) into collecting_data_for_create_graph(type_of_transaction) done
+                adding budget_chart_horiizntal as a package
+                noe is show all profits and losses on a chart
