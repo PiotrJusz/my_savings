@@ -11,6 +11,7 @@
         TASK_6: rename category - if category name is the same like category already using - ask user to join categories
                 update table of categories
                 update table of financial_operations
+                add category if not exist
         TASK_7: add save_database i place when data should be saved
         TASK 2: make a plots of profits and losses (10)
                 changed function create_graph(type_of_transaction) into collecting_data_for_create_graph(type_of_transaction) done

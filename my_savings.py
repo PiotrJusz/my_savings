@@ -310,9 +310,17 @@ def rename_category():
         rename_category = input("Enter the name of category which names you want change: ")
         if rename_category in list_of_categories:
             new_category_name = input(F"Enter the new name for {rename_category}: ")
+
             categories = []
             categories.append(new_category_name)
             categories.append(rename_category)
+
+            # add new_category_name if not exist in database
+            list_of_categories = get_all_categories()
+            if new_category_name is not list_of_categories: 
+                print(new_category_name," added to database.")
+                add_new_category(new_category_name)
+
             # rename category's name
             try:
 
@@ -464,27 +472,17 @@ def edit_operation():
                     """)
                     if option == "0":
                         break
+                    if option == "31":
+                        update_one_col_in_record(1, id_of_operation)
+                    if option == "32": # edit type
+                        update_one_col_in_record(2, id_of_operation)
+                    if option == "33":
+                        update_one_col_in_record(3, id_of_operation)
+                    if option == "34": # edit description
+                        update_one_col_in_record(4, id_of_operation)
                     if option == "35":
-                        # change amount
-                        # access to datavbase to tet amount
-                        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
-                        operation = cursor.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
-                        # extract data from operation
-                        operation_data = ""
-                        operation_data = extract_data(operation, 5)
-
-                        # access to database to display edited operation
-                        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
-                        operation = cursor.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
-                        print_data(operation)
-                        print("Current amount: ",operation_data[0])
-                        temp_amount = check_is_datatype ("float", "New amount: ")
-
-                        # access to database to update amount
-                        # update database - change amount
-                        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
-                        operation = cursor.execute(""" Update  financial_operations SET amount = ? WHERE id = ? """,(temp_amount,  id_of_operation,))
-                        save()
+                        update_one_col_in_record(5, id_of_operation)
+                        
                         
                     if option == "36":
                         # delete operation
@@ -509,12 +507,133 @@ def check_is_datatype(datatype, question):
         temp_data = 0.00
         if datatype == "float":
             try:
-                temp_data = float(input(question))
+                temp_data = round (float(input(question)), 2)
                 break
             except ValueError:
                 print("Something's wrong. Try again. Enter properly value.")
 
-    return round(temp_data, 2)          
+        if datatype == "type_of_operation": # for "L" or "P"
+            while True:
+                temp_data = input(question)
+                temp_data = temp_data.upper()
+                # test: print("temp_data: ", temp_data)
+                # test: input("Enter to continue...")
+                if temp_data == "L" or temp_data == "P":
+                    break
+            break
+
+        if datatype == "string":
+            temp_data = input(question)
+            break
+
+        if datatype == "date":
+            while True:
+                # check date in datatype
+                try:
+                    temp_data = input(question)
+                    date_object = datetime.datetime.strptime(temp_data, '%Y-%m-%d').date()
+                    break
+                except Exception as e:
+                    print("Exception: ",e)
+                    print("Enter date of operation in format: YYYY-M-D.")
+            
+            break
+
+    return temp_data   
+
+
+def update_one_col_in_record(num_of_column, id_of_operation):
+    
+    # access to database to display edited operation
+    db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+    operation = cursor.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+    print_data(operation)
+
+    # prepairng for extraction data or one column from record
+    operation_data = ""
+    db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+    operation = cursor.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+
+    if num_of_column == 0:  # id
+        # extract data from operation
+        operation_data = extract_data(operation, num_of_column)
+        print("Current id: ",operation_data[0])
+        temp_column = check_is_datatype ("integer", "New id: ")
+
+        # update
+        # access to database to update amount
+        # update database - change amount
+        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+        operation = cursor.execute(""" Update  financial_operations SET id = ? WHERE id = ? """,(temp_column,  id_of_operation,))
+    elif num_of_column == 1:    # edit date
+         # extract data from operation
+        operation_data = extract_data(operation, num_of_column)
+        print("Current date: ",operation_data[0])
+        temp_column = check_is_datatype ("date", "New date: ")
+
+        # update
+        # access to database to update description
+        # update database - change description
+        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+        operation = cursor.execute(""" Update  financial_operations SET date_of_operation = ? WHERE id = ? """,(temp_column,  id_of_operation,))
+    elif num_of_column == 2:    # edit type of operation
+        # extract data from operation
+        operation_data = extract_data(operation, num_of_column)
+        print("Current type: ",operation_data[0])
+        temp_column = check_is_datatype ("type_of_operation", "New type of operation: ")
+
+        # update
+        # access to database to update operation
+        # update database - change operation
+        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+        operation = cursor.execute(""" Update  financial_operations SET type = ? WHERE id = ? """,(temp_column,  id_of_operation,))
+    elif num_of_column == 3:    # edit category
+        # extract data from operation
+        operation_data = extract_data(operation, num_of_column)
+        print("Current category: ",operation_data[0])
+        temp_column = check_is_datatype ("string", "Assign to category: ")
+
+        # add edited category if not exisyt indatabase
+        list_of_categories = get_all_categories()
+        if temp_column is not list_of_categories: 
+                print(temp_column," added to database.")
+                add_new_category(temp_column)
+        # update
+        # access to database to update category
+        # update database - change category
+        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+        operation = cursor.execute(""" Update  financial_operations SET category = ? WHERE id = ? """,(temp_column,  id_of_operation,))
+    elif num_of_column == 4:    # edit description
+        # extract data from operation
+        operation_data = extract_data(operation, num_of_column)
+        print("Current description: ",operation_data[0])
+        temp_column = check_is_datatype ("string", "New description: ")
+
+        # update
+        # access to database to update description
+        # update database - change description
+        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+        operation = cursor.execute(""" Update  financial_operations SET description = ? WHERE id = ? """,(temp_column,  id_of_operation,))
+    elif num_of_column == 5:    # edit  amount
+        # extract data from operation
+        operation_data = extract_data(operation, num_of_column)
+        print("Current category: ",operation_data[0])
+        temp_column = check_is_datatype ("float", "New amount: ")
+
+        # update
+        # access to database to update amount
+        # update database - change amount
+        db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+        operation = cursor.execute(""" Update  financial_operations SET amount = ? WHERE id = ? """,(temp_column,  id_of_operation,))
+    else:
+        print("Something's wrong. Back to main menu")
+
+
+    # access to database to update amount
+    # update database - change amount
+    # db.execute(""" SELECT * FROM financial_operations WHERE id = ? """,(id_of_operation,))
+    # operation = cursor.execute(""" Update  financial_operations SET amount = ? WHERE id = ? """,(temp_column,  id_of_operation,))
+    save()       
 
             
             
